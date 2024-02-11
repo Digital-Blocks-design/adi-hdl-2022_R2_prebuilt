@@ -42,9 +42,9 @@ iseconfig
 xlnx_auto*
 _ngo
 _xmsgs
-component.xml
+
 *.jou
-xgui
+
 *.runs
 *.srcs
 *.sdk
@@ -75,9 +75,9 @@ reconfig_mif
 *.pin
 *.os
 *webtalk*
-*.xml
+
 *.hw
-gui
+
 .timestamp_intel
 temporary_case_dependencies.mk
 *.zip
@@ -96,7 +96,7 @@ _vmake
 *.gen*
 *.xsa
 *.pdi
-library/**/bd/bd.tcl
+
 *.syn.smsg
 *.syn.summary
 qdb
