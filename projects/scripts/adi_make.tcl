@@ -61,13 +61,19 @@ namespace eval adi_make {
   # get library absolute path
   set root_hdl_folder ""
   set glb_path $PWD
-  if { [regexp projects $glb_path] } {
-    regsub {/projects.*$} $glb_path "" root_hdl_folder
-  } else {
-    puts "ERROR: Not in hdl/* folder"
-    return
-  }
+  
+#   if { [regexp projects $glb_path] } {
+#     regsub {/projects.*$} $glb_path "" root_hdl_folder
+# 	puts "root_dir :  $root_hdl_folder"
+#   } else {
+#     puts "ERROR: Not in hdl/* folder"
+#     return
+#   }
 
+# load script
+  source ../../scripts/adi_env.tcl
+ 
+  set root_hdl_folder "$ad_hdl_dir"
   set library_dir "$root_hdl_folder/library"
 
   #----------------------------------------------------------------------------
@@ -82,7 +88,7 @@ namespace eval adi_make {
 
   #----------------------------------------------------------------------------
   # returns the projects required set of libraries
-  proc get_libraries {} {
+  proc get_project_libraries {} {
 
     set build_list ""
 
@@ -100,9 +106,38 @@ namespace eval adi_make {
         append build_list "$library "
       }
     }
-    return $build_list
+	puts_msg 	$build_list
+    return 		$build_list
   }
 
+
+  #----------------------------------------------------------------------------
+  # returns all libraries
+  proc get_all_libraries {} {
+
+    set build_list ""
+	variable root_hdl_folder
+
+    set search_pattern "LIB_DEPS.*="
+    set fp1 [open "$root_hdl_folder/library/ALL_LIB"  r]
+    set file_data [read $fp1]
+    close $fp1
+
+    set lines [split $file_data \n]
+    foreach line $lines {
+      if { [regexp $search_pattern $line] } {
+        regsub -all $search_pattern $line "" library
+        set library [string trim $library]
+        puts_msg "\t- project dep: $library"
+        append build_list "$library "
+      }
+    }
+	
+	puts_msg $build_list
+    return 	 $build_list
+  }
+  
+  
   #----------------------------------------------------------------------------
   proc lib { libraries } {
 
@@ -112,9 +147,13 @@ namespace eval adi_make {
 
     set build_list $libraries
     if { $libraries == "all" } {
-      set build_list "[get_libraries]"
+      set build_list "[get_all_libraries]"
     }
-
+	
+	if { $libraries == "project" } {
+      set build_list "[get_project_libraries]"
+    }
+	
     set libraries ""
     puts "Building:"
     foreach b_lib $build_list {
